@@ -1,47 +1,24 @@
 [
   {
-    "id": "general-coding-assistant",
-    "name": "General Coding Assistant",
-    "description": "Routes user requests by complexity to the appropriate model, with quality evaluation.",
-    "author": "archon-ide",
+    "id": "test-flow1",
+    "name": "Test Flow1",
+    "description": "A simple model router",
+    "author": "newtro",
     "version": "1.0.0",
-    "stars": 12,
-    "downloads": 45,
-    "tags": ["general", "routing", "multi-model"],
-    "nodeTypes": ["start", "intent", "router", "llm", "tool", "evaluator", "end"],
-    "nodeCount": 9,
-    "createdAt": "2026-01-15T00:00:00Z",
-    "updatedAt": "2026-02-01T00:00:00Z",
-    "flowPath": "flows/general-coding-assistant/flow.json"
-  },
-  {
-    "id": "tdd-workflow",
-    "name": "TDD Workflow",
-    "description": "Write tests first, then implement code. Red-green-refactor cycle with automated test runner.",
-    "author": "archon-ide",
-    "version": "1.0.0",
-    "stars": 42,
-    "downloads": 89,
-    "tags": ["testing", "tdd", "quality"],
-    "nodeTypes": ["start", "project-context", "llm", "tool", "evaluator", "end"],
-    "nodeCount": 8,
-    "createdAt": "2026-01-20T00:00:00Z",
-    "updatedAt": "2026-02-05T00:00:00Z",
-    "flowPath": "flows/tdd-workflow/flow.json"
-  },
-  {
-    "id": "code-reviewer",
-    "name": "Code Review Agent",
-    "description": "Multi-pass code review: security audit, performance check, style compliance, then summary.",
-    "author": "archon-ide",
-    "version": "1.0.0",
-    "stars": 38,
-    "downloads": 67,
-    "tags": ["review", "security", "performance", "quality"],
-    "nodeTypes": ["start", "project-context", "parallel", "llm", "join", "human-review", "end"],
-    "nodeCount": 10,
-    "createdAt": "2026-01-25T00:00:00Z",
-    "updatedAt": "2026-02-08T00:00:00Z",
-    "flowPath": "flows/code-reviewer/flow.json"
+    "stars": 0,
+    "downloads": 0,
+    "tags": [
+      "simple"
+    ],
+    "nodeTypes": [
+      "start",
+      "end",
+      "router",
+      "llm"
+    ],
+    "nodeCount": 6,
+    "createdAt": "2026-02-11T22:40:58.064Z",
+    "updatedAt": "2026-02-11T22:40:58.064Z",
+    "flowPath": "flows/test-flow1/flow.json"
   }
 ]
