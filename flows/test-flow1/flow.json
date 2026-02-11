@@ -1,0 +1,166 @@
+{
+  "id": "test-flow1",
+  "name": "Test Flow1",
+  "description": "",
+  "nodes": [
+    {
+      "id": "start_1",
+      "kind": "start",
+      "label": "Start",
+      "x": 224,
+      "y": -128,
+      "config": {
+        "kind": "start",
+        "config": {}
+      }
+    },
+    {
+      "id": "end_1",
+      "kind": "end",
+      "label": "Deliver Results",
+      "x": 300,
+      "y": 400,
+      "config": {
+        "kind": "end",
+        "config": {}
+      }
+    },
+    {
+      "id": "node_1770840288655_2",
+      "kind": "router",
+      "label": "Router",
+      "x": 224,
+      "y": -32,
+      "config": {
+        "kind": "router",
+        "config": {
+          "mode": "llm",
+          "rules": [],
+          "llmOutputs": [
+            "Opus",
+            "Sonnet",
+            "Haiku"
+          ],
+          "llmPrompt": "Determine the complexity of the user's prompt and select the appropriate model. \n\nOpus, for the most complex task requiring thinking.\n\nSonnet for complex request\n\nHaiku for simple requests"
+        }
+      }
+    },
+    {
+      "id": "node_1770840949617_1",
+      "kind": "llm",
+      "label": "Opus",
+      "x": 80,
+      "y": 96,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "opus",
+          "systemPrompt": "You are a helpful ai assistant",
+          "temperature": 0.7,
+          "maxTokens": 128000,
+          "tools": [],
+          "enableThinking": true,
+          "toolPreset": "full-access"
+        }
+      }
+    },
+    {
+      "id": "node_1770840977010_2",
+      "kind": "llm",
+      "label": "Sonnet",
+      "x": 272,
+      "y": 96,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "sonnet",
+          "systemPrompt": "You are a helpful assistant",
+          "temperature": 0.7,
+          "maxTokens": 64000,
+          "tools": [],
+          "enableThinking": true,
+          "toolPreset": "full-access"
+        }
+      }
+    },
+    {
+      "id": "node_1770841003262_3",
+      "kind": "llm",
+      "label": "Haiku",
+      "x": 464,
+      "y": 96,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "haiku",
+          "systemPrompt": "You are a helpful assistant",
+          "temperature": 0.7,
+          "maxTokens": 64000,
+          "tools": [],
+          "enableThinking": true,
+          "toolPreset": "full-access"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "xy-edge__start_1default-node_1770840288655_2",
+      "source": "start_1",
+      "target": "node_1770840288655_2",
+      "sourceHandle": "default",
+      "targetHandle": null,
+      "signal": "default"
+    },
+    {
+      "id": "xy-edge__node_1770840288655_2Opus-node_1770840949617_1",
+      "source": "node_1770840288655_2",
+      "target": "node_1770840949617_1",
+      "sourceHandle": "Opus",
+      "targetHandle": null,
+      "signal": "Opus"
+    },
+    {
+      "id": "xy-edge__node_1770840288655_2Sonnet-node_1770840977010_2",
+      "source": "node_1770840288655_2",
+      "target": "node_1770840977010_2",
+      "sourceHandle": "Sonnet",
+      "targetHandle": null,
+      "signal": "Sonnet"
+    },
+    {
+      "id": "xy-edge__node_1770840288655_2Haiku-node_1770841003262_3",
+      "source": "node_1770840288655_2",
+      "target": "node_1770841003262_3",
+      "sourceHandle": "Haiku",
+      "targetHandle": null,
+      "signal": "Haiku"
+    },
+    {
+      "id": "xy-edge__node_1770840949617_1default-end_1",
+      "source": "node_1770840949617_1",
+      "target": "end_1",
+      "sourceHandle": "default",
+      "targetHandle": null,
+      "signal": "default"
+    },
+    {
+      "id": "xy-edge__node_1770840977010_2default-end_1",
+      "source": "node_1770840977010_2",
+      "target": "end_1",
+      "sourceHandle": "default",
+      "targetHandle": null,
+      "signal": "default"
+    },
+    {
+      "id": "xy-edge__node_1770841003262_3default-end_1",
+      "source": "node_1770841003262_3",
+      "target": "end_1",
+      "sourceHandle": "default",
+      "targetHandle": null,
+      "signal": "default"
+    }
+  ],
+  "createdAt": 1770849658064,
+  "updatedAt": 1770849658064
+}
