@@ -1,0 +1,174 @@
+{
+  "id": "code-reviewer",
+  "name": "Code Review Agent",
+  "description": "Multi-pass code review: security audit, performance check, style compliance, then summary.",
+  "nodes": [
+    {
+      "id": "start_1",
+      "kind": "start",
+      "label": "Code to Review",
+      "x": 400,
+      "y": 30,
+      "config": { "kind": "start", "config": {} }
+    },
+    {
+      "id": "ctx_1",
+      "kind": "project-context",
+      "label": "Load Codebase",
+      "x": 400,
+      "y": 140,
+      "config": {
+        "kind": "project-context",
+        "config": {
+          "files": [],
+          "includePatterns": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.py", "**/*.go", "**/*.rs"],
+          "excludePatterns": ["node_modules/**", "dist/**", ".git/**", "*.lock"],
+          "respectGitignore": true,
+          "maxTokens": 80000,
+          "outputFormat": "tree-and-contents"
+        }
+      }
+    },
+    {
+      "id": "parallel_1",
+      "kind": "parallel",
+      "label": "Review Passes",
+      "x": 400,
+      "y": 270,
+      "config": {
+        "kind": "parallel",
+        "config": {
+          "branches": 3,
+          "mergeStrategy": "all"
+        }
+      }
+    },
+    {
+      "id": "llm_security",
+      "kind": "llm",
+      "label": "Security Audit",
+      "x": 140,
+      "y": 400,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "sonnet",
+          "systemPrompt": "You are a security auditor. Review the code for OWASP Top 10 vulnerabilities, injection risks, auth issues, and data exposure. Be specific about file and line numbers.",
+          "temperature": 0.3,
+          "maxTokens": 4096,
+          "tools": ["Read", "Glob", "Grep"],
+          "enableThinking": true,
+          "toolPreset": "read-only"
+        }
+      }
+    },
+    {
+      "id": "llm_perf",
+      "kind": "llm",
+      "label": "Performance Check",
+      "x": 400,
+      "y": 400,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "sonnet",
+          "systemPrompt": "You are a performance engineer. Review for N+1 queries, memory leaks, unnecessary re-renders, O(n^2) algorithms, and missing caching. Be specific.",
+          "temperature": 0.3,
+          "maxTokens": 4096,
+          "tools": ["Read", "Glob", "Grep"],
+          "enableThinking": true,
+          "toolPreset": "read-only"
+        }
+      }
+    },
+    {
+      "id": "llm_style",
+      "kind": "llm",
+      "label": "Style Review",
+      "x": 660,
+      "y": 400,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "haiku",
+          "systemPrompt": "Review code style: naming conventions, consistent formatting, proper error handling, meaningful comments, and TypeScript best practices.",
+          "temperature": 0.3,
+          "maxTokens": 2048,
+          "tools": ["Read", "Glob", "Grep"],
+          "enableThinking": false,
+          "toolPreset": "read-only"
+        }
+      }
+    },
+    {
+      "id": "join_1",
+      "kind": "join",
+      "label": "Collect Reviews",
+      "x": 400,
+      "y": 540,
+      "config": {
+        "kind": "join",
+        "config": {
+          "mode": "all",
+          "timeout": 0
+        }
+      }
+    },
+    {
+      "id": "llm_summary",
+      "kind": "llm",
+      "label": "Summary Report",
+      "x": 400,
+      "y": 660,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "sonnet",
+          "systemPrompt": "Combine the security, performance, and style reviews into a single structured report. Prioritize findings by severity (critical/high/medium/low). Include actionable recommendations.",
+          "temperature": 0.5,
+          "maxTokens": 4096,
+          "tools": [],
+          "enableThinking": true,
+          "toolPreset": "none"
+        }
+      }
+    },
+    {
+      "id": "review_1",
+      "kind": "human-review",
+      "label": "Approve Report",
+      "x": 400,
+      "y": 790,
+      "config": {
+        "kind": "human-review",
+        "config": {
+          "prompt": "Review the consolidated code review report. Approve to deliver, or reject for another pass.",
+          "timeout": 0
+        }
+      }
+    },
+    {
+      "id": "end_1",
+      "kind": "end",
+      "label": "Deliver Report",
+      "x": 400,
+      "y": 920,
+      "config": { "kind": "end", "config": {} }
+    }
+  ],
+  "edges": [
+    { "id": "e_start_ctx", "source": "start_1", "target": "ctx_1", "sourceHandle": "default", "targetHandle": null, "signal": "default" },
+    { "id": "e_ctx_par", "source": "ctx_1", "target": "parallel_1", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_par_sec", "source": "parallel_1", "target": "llm_security", "sourceHandle": "default", "targetHandle": null, "signal": "default" },
+    { "id": "e_par_perf", "source": "parallel_1", "target": "llm_perf", "sourceHandle": "default", "targetHandle": null, "signal": "default" },
+    { "id": "e_par_style", "source": "parallel_1", "target": "llm_style", "sourceHandle": "default", "targetHandle": null, "signal": "default" },
+    { "id": "e_sec_join", "source": "llm_security", "target": "join_1", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_perf_join", "source": "llm_perf", "target": "join_1", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_style_join", "source": "llm_style", "target": "join_1", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_join_sum", "source": "join_1", "target": "llm_summary", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_sum_review", "source": "llm_summary", "target": "review_1", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_review_end", "source": "review_1", "target": "end_1", "sourceHandle": "default", "targetHandle": null, "signal": "default" }
+  ],
+  "createdAt": 1707600000000,
+  "updatedAt": 1707600000000
+}

@@ -1,0 +1,49 @@
+name: Validate Flows
+
+on:
+  pull_request:
+    paths:
+      - 'flows/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate index.json
+        run: |
+          echo "Validating flows/index.json..."
+          node -e "
+            const fs = require('fs');
+            const index = JSON.parse(fs.readFileSync('flows/index.json', 'utf-8'));
+            if (!Array.isArray(index)) throw new Error('index.json must be an array');
+            const required = ['id', 'name', 'description', 'author', 'version', 'tags', 'flowPath'];
+            for (const entry of index) {
+              for (const field of required) {
+                if (!entry[field]) throw new Error('Missing field ' + field + ' in entry ' + entry.id);
+              }
+            }
+            console.log('index.json is valid (' + index.length + ' flows)');
+          "
+
+      - name: Validate flow JSONs
+        run: |
+          echo "Validating flow JSON files..."
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const index = JSON.parse(fs.readFileSync('flows/index.json', 'utf-8'));
+            for (const entry of index) {
+              const flowPath = entry.flowPath;
+              if (!fs.existsSync(flowPath)) {
+                throw new Error('Missing flow file: ' + flowPath);
+              }
+              const flow = JSON.parse(fs.readFileSync(flowPath, 'utf-8'));
+              if (!Array.isArray(flow.nodes)) throw new Error('Invalid nodes in ' + flowPath);
+              if (!Array.isArray(flow.edges)) throw new Error('Invalid edges in ' + flowPath);
+              if (!flow.name) throw new Error('Missing name in ' + flowPath);
+              console.log('Valid: ' + flowPath + ' (' + flow.nodes.length + ' nodes, ' + flow.edges.length + ' edges)');
+            }
+            console.log('All flows valid');
+          "

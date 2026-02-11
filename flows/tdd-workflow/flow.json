@@ -1,0 +1,132 @@
+{
+  "id": "tdd-workflow",
+  "name": "TDD Workflow",
+  "description": "Write tests first, then implement code. Red-green-refactor cycle with automated test runner.",
+  "nodes": [
+    {
+      "id": "start_1",
+      "kind": "start",
+      "label": "Task Input",
+      "x": 400,
+      "y": 30,
+      "config": { "kind": "start", "config": {} }
+    },
+    {
+      "id": "ctx_1",
+      "kind": "project-context",
+      "label": "Load Project",
+      "x": 400,
+      "y": 140,
+      "config": {
+        "kind": "project-context",
+        "config": {
+          "files": [],
+          "includePatterns": ["**/*.ts", "**/*.tsx", "**/*.test.*"],
+          "excludePatterns": ["node_modules/**", "dist/**", ".git/**"],
+          "respectGitignore": true,
+          "maxTokens": 50000,
+          "outputFormat": "tree-and-contents"
+        }
+      }
+    },
+    {
+      "id": "llm_tests",
+      "kind": "llm",
+      "label": "Write Tests",
+      "x": 400,
+      "y": 270,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "sonnet",
+          "systemPrompt": "You are a TDD expert. Write comprehensive failing tests FIRST for the user's task. Focus on edge cases and expected behavior. Use the project's existing test framework.",
+          "temperature": 0.5,
+          "maxTokens": 4096,
+          "tools": ["Read", "Write", "Edit", "Glob", "Grep"],
+          "enableThinking": true,
+          "toolPreset": "full-access"
+        }
+      }
+    },
+    {
+      "id": "tool_red",
+      "kind": "tool",
+      "label": "Red Phase (Tests Fail)",
+      "x": 400,
+      "y": 400,
+      "config": {
+        "kind": "tool",
+        "config": {
+          "toolName": "run-tests",
+          "args": {}
+        }
+      }
+    },
+    {
+      "id": "llm_impl",
+      "kind": "llm",
+      "label": "Implement Code",
+      "x": 400,
+      "y": 530,
+      "config": {
+        "kind": "llm",
+        "config": {
+          "model": "sonnet",
+          "systemPrompt": "You are a TDD practitioner. Write the MINIMUM code necessary to make the failing tests pass. Do not add extra functionality beyond what the tests require.",
+          "temperature": 0.5,
+          "maxTokens": 4096,
+          "tools": ["Read", "Write", "Edit", "Glob", "Grep", "Bash"],
+          "enableThinking": true,
+          "toolPreset": "full-access"
+        }
+      }
+    },
+    {
+      "id": "tool_green",
+      "kind": "tool",
+      "label": "Green Phase (Tests Pass)",
+      "x": 400,
+      "y": 660,
+      "config": {
+        "kind": "tool",
+        "config": {
+          "toolName": "run-tests",
+          "args": {}
+        }
+      }
+    },
+    {
+      "id": "eval_1",
+      "kind": "evaluator",
+      "label": "Quality Gate",
+      "x": 400,
+      "y": 790,
+      "config": {
+        "kind": "evaluator",
+        "config": {
+          "criteria": "Evaluate: 1) All tests pass 2) Code is minimal and clean 3) No unnecessary complexity 4) Good test coverage of edge cases",
+          "passThreshold": 80
+        }
+      }
+    },
+    {
+      "id": "end_1",
+      "kind": "end",
+      "label": "Done",
+      "x": 400,
+      "y": 920,
+      "config": { "kind": "end", "config": {} }
+    }
+  ],
+  "edges": [
+    { "id": "e_start_ctx", "source": "start_1", "target": "ctx_1", "sourceHandle": "default", "targetHandle": null, "signal": "default" },
+    { "id": "e_ctx_tests", "source": "ctx_1", "target": "llm_tests", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_tests_red", "source": "llm_tests", "target": "tool_red", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_red_impl", "source": "tool_red", "target": "llm_impl", "sourceHandle": "default", "targetHandle": null, "signal": "default" },
+    { "id": "e_impl_green", "source": "llm_impl", "target": "tool_green", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_green_eval", "source": "tool_green", "target": "eval_1", "sourceHandle": "default", "targetHandle": null, "signal": "success" },
+    { "id": "e_eval_end", "source": "eval_1", "target": "end_1", "sourceHandle": "success", "targetHandle": null, "signal": "success" }
+  ],
+  "createdAt": 1707600000000,
+  "updatedAt": 1707600000000
+}
