@@ -1,0 +1,47 @@
+name: Community Vote Tracker
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Check every 6 hours
+  workflow_dispatch:
+
+jobs:
+  check-votes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const VOTE_THRESHOLD = 3;
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+            });
+
+            for (const pr of prs.data) {
+              const reactions = await github.rest.reactions.listForIssue({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+              });
+
+              const thumbsUp = reactions.data.filter(r => r.content === '+1').length;
+              const labels = pr.labels.map(l => l.name);
+
+              if (thumbsUp >= VOTE_THRESHOLD && !labels.includes('community-approved')) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  labels: ['community-approved'],
+                });
+
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: `This flow has received ${thumbsUp} community votes and is now eligible for merge. @newtro ready for your review.`,
+                });
+              }
+            }
